@@ -1,9 +1,20 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS configuration
+const corsOptions = {
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : true, // Allow all origins in development
+    methods: ['GET', 'HEAD', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false
+};
+
+app.use(cors(corsOptions));
 
 // Middleware for basic logging
 app.use((req, res, next) => {
@@ -24,9 +35,9 @@ app.get('/cv', (req, res) => {
     }
 
     try {
-        // Set appropriate headers for PDF file
+        // Set appropriate headers for PDF file download
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline; filename="henry_cv.pdf"');
+        res.setHeader('Content-Disposition', 'attachment; filename="henry_cv.pdf"');
 
         // Stream the PDF file
         const fileStream = fs.createReadStream(cvPath);
